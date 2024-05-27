@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "dcm_upload_backend": {
+      "main": "src/dcm_upload_backend/main.mo",
+      "type": "motoko"
+    },
+    "dcm_upload_frontend": {
+      "dependencies": [
+        "dcm_upload_backend"
+      ],
+      "source": [
+        "src/dcm_upload_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "dcm_upload_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
