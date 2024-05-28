@@ -1,29 +1,50 @@
-import { useState } from 'react';
-import { dcm_upload_backend } from 'declarations/dcm_upload_backend';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 function App() {
-  const [greeting, setGreeting] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadMessage, setUploadMessage] = useState('');
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    dcm_upload_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  //Upload file to flask server
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setUploadMessage('No file selected');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await axios.post('http://localhost:5000/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const fileUrl = response.data.file_url;
+      console.log("File Uploaded Successfully.");
+      setUploadMessage(`File uploaded successfully. File URL: ${fileUrl}`);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      setUploadMessage('File upload failed');
+    }
+  };
+
+  
 
   return (
     <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
+      <div>
+        <h1>Upload File</h1>
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={handleUpload}>Upload</button>
+        <p>{uploadMessage}</p>
+      </div>
     </main>
   );
 }
